@@ -6,7 +6,6 @@ import {
   EditorCommandItem,
   EditorCommandList,
   EditorContent,
-  type EditorInstance,
   EditorRoot,
   ImageResizer,
   type JSONContent,
@@ -14,7 +13,7 @@ import {
   handleImageDrop,
   handleImagePaste,
 } from "novel";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { defaultExtensions } from "./extensions";
 import { ColorSelector } from "./selectors/color-selector";
@@ -62,7 +61,7 @@ const TailwindAdvancedEditor = ({
    * 🔥 AUTO-SAVE TO SUPABASE (DEBOUNCED)
    */
   const debouncedSave = useDebouncedCallback(
-    async (editor: EditorInstance) => {
+    async (editor) => {
       const json = editor.getJSON();
       setCharsCount(editor.storage.characterCount.words());
 
@@ -114,17 +113,14 @@ const TailwindAdvancedEditor = ({
             },
           }}
           onUpdate={({ editor }) => {
-  const json = editor.getJSON();
+            const json = editor.getJSON();
 
-  // 🔒 Prevent saving empty document
-  if (!json || !json.content || json.content.length === 0) {
-    return;
-  }
+            // 🔒 Prevent saving empty document
+            if (!json?.content?.length) return;
 
-  setSaveStatus("Saving…");
-  debouncedSave(editor);
-}}
-
+            setSaveStatus("Saving…");
+            debouncedSave(editor);
+          }}
           slotAfter={<ImageResizer />}
         >
           <EditorCommand className="z-50 h-auto max-h-[330px] overflow-y-auto rounded-md border border-muted bg-background px-1 py-2 shadow-md transition-all">
@@ -160,7 +156,6 @@ const TailwindAdvancedEditor = ({
             <Separator orientation="vertical" />
             <NodeSelector open={openNode} onOpenChange={setOpenNode} />
             <Separator orientation="vertical" />
-
             <LinkSelector open={openLink} onOpenChange={setOpenLink} />
             <Separator orientation="vertical" />
             <MathSelector />
